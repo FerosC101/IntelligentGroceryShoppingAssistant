@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3edbd32f-5cd2-40e7-a370-cc5bf7f576aa" name="Changes" comment="restart">
-      <change afterPath="$PROJECT_DIR$/src/database/Db_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/view/Menu.py" afterDir="false" />
+    <list default="true" id="3edbd32f-5cd2-40e7-a370-cc5bf7f576aa" name="Changes" comment="add getters">
+      <change afterPath="$PROJECT_DIR$/src/models/ShoppingList.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schema.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/UserProfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/UserProfile.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -156,7 +154,7 @@
       <workItem from="1734098504405" duration="4132000" />
       <workItem from="1734103581125" duration="1676000" />
       <workItem from="1734143979453" duration="3949000" />
-      <workItem from="1734190295595" duration="1737000" />
+      <workItem from="1734190295595" duration="3897000" />
     </task>
     <task id="LOCAL-00001" summary="Start">
       <option name="closed" value="true" />
@@ -198,7 +196,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734105232948</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add getters">
+      <option name="closed" value="true" />
+      <created>1734192091072</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734192091072</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,7 +213,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Start" />
     <MESSAGE value="restart" />
-    <option name="LAST_COMMIT_MESSAGE" value="restart" />
+    <MESSAGE value="add getters" />
+    <option name="LAST_COMMIT_MESSAGE" value="add getters" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
