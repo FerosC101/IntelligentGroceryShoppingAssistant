@@ -22,7 +22,7 @@ class ShoppingList:
             INSERT INTO shopping_list (user_id, product_id, quantity)
             VALUES (%s, %s, %s)
             ON CONFLICT (user_id, product_id) DO UPDATE SET
-            quantity = shopping_list.quantity + EXCLUDED.quantity
+            quantity = shopping_list.quantity + EXCLUDED.quantity;
         """
         cursor.execute(query, [self.user_id, product_id, quantity])
         conn.commit()
@@ -32,7 +32,7 @@ class ShoppingList:
     def remove_item(self, product_id):
         conn = createConnection()
         cursor = conn.cursor()
-        query = "DELETE FROM shopping_list WHERE user_id = %s AND product_id = %s"
+        query = "DELETE FROM shopping_list WHERE user_id = %s AND product_id = %s;"
         cursor.execute(query, [self.user_id, product_id])
         conn.commit()
         cursor.close()

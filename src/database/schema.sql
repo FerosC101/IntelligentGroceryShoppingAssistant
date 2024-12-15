@@ -19,3 +19,9 @@ CREATE TABLE shopping_list(
     quantity INT,
     PRIMARY KEY (user_id, product_id)
 );
+
+CREATE TABLE store_products (
+    store_id SERIAL,
+    product_id INT REFERENCES products(product_id),
+    PRIMARY KEY (product_id)
+);

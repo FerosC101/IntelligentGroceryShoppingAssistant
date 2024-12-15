@@ -29,7 +29,7 @@ class UserProfile:
     def get_from_db(user_id):
         conn = createConnection()
         cur = conn.cursor()
-        query = "SELECT * FROM users WHERE user_id = %s"
+        query = "SELECT * FROM users WHERE user_id = %s;"
         cursor.execute(query, (user_id,))
         user_data = cursor.fetchone()
         cursor.close()
