@@ -43,7 +43,34 @@ class UserProfile:
             )
         else:
             return None
-    
+
+    @staticmethod
+    def create_user(username, dietaryPreference):
+        conn = createConnection()
+        cur = conn.cursor()
+        query = "INSERT INTO users (name, dietaryPreference) VALUES (%s, %s) RETURNING user_id;"
+        cur.execute(query, [username, dietaryPreference])
+        user_id = cur.fetchone()['user_id']
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return UserProfile(user_id, name=username, dietaryPreference=dietaryPreference)
+
+    @staticmethod
+    def get_user(user_id):
+        conn = createConnection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE user_id = %s;", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+        return user
+
+
     def update_budget(self, new_budget):
         self.budget = new_budget
         self.save_to_db()
+
+    def __repr__(self):
+        return f"<UserProfile(user_id={self.user_id}, name={self.name}, budget={self.budget}, dietaryPreference={self.dietaryPreference})>"
