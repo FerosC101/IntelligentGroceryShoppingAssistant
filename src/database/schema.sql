@@ -25,3 +25,5 @@ CREATE TABLE store_products (
     product_id INT REFERENCES products(product_id),
     PRIMARY KEY (product_id)
 );
+
+INSERT INTO users VALUES (1, 'test_user', 0, 'vegetarian');
