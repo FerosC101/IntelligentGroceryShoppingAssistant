@@ -4,13 +4,13 @@ CREATE TABLE users(
     budget NUMERIC,
     dietaryPreference TEXT
 );
-
+DROP TABLE products;
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     price NUMERIC,
     category VARCHAR(50),
-    nutrition_info JSONB
+    nutrition_info TEXT
 );
 
 CREATE TABLE shopping_list(
@@ -27,3 +27,5 @@ CREATE TABLE store_products (
 );
 
 INSERT INTO users VALUES (1, 'test_user', 0, 'vegetarian');
+INSERT INTO products VALUES (101, 'cinnabon', '10', 'food', '');
+INSERT INTO shopping_list VALUES (1, '101', '2');
