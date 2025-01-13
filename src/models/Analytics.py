@@ -1,4 +1,5 @@
 from psycopg2.extras import RealDictCursor
+from unicodedata import category
 
 from src.database.Db_manager import createConnection
 from src.models.Product import Product
@@ -36,3 +37,9 @@ class Analytics:
         cursor.close()
         conn.close()
         return [Product(**rec) for rec in recommendations]
+
+    @staticmethod
+    def predict_price(self, base_price=None, season=None):
+        seasonal_trends = {"summer": 1.1, "winter": 0.9}
+        return {category: base_price * seasonal_trends.get(season, 1)}
+

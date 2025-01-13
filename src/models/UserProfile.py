@@ -1,4 +1,3 @@
-from psycopg2._psycopg import cursor
 from src.database.Db_manager import createConnection
 
 class UserProfile:
@@ -43,20 +42,20 @@ class UserProfile:
         return None
 
     @staticmethod
-    def create_user(name, dietaryPreference):
+    def create_user(name, budget, dietaryPreference):
         conn = createConnection()
         cur = conn.cursor()
         query = """
-            INSERT INTO users (name, dietaryPreference)
-            VALUES (%s, %s)
+            INSERT INTO users (name, budget, dietaryPreference)
+            VALUES (%s, %s, %s)
             RETURNING user_id;
         """
-        cur.execute(query, (name, dietaryPreference))
+        cur.execute(query, (name, budget, dietaryPreference))
         user_id = cur.fetchone()[0]
         conn.commit()
         cur.close()
         conn.close()
-        return UserProfile(user_id=user_id, name=name, dietaryPreference=dietaryPreference)
+        return UserProfile(user_id=user_id, name=name, budget=budget, dietaryPreference=dietaryPreference)
 
     @staticmethod
     def get_user(user_id):
@@ -67,6 +66,13 @@ class UserProfile:
         cur.close()
         conn.close()
         return user
+    
+    @staticmethod
+    def set_budget(self, user_id, new_budget):
+        if new_budget < 0:
+            raise ValueError("Budget cannot be negative")
+        self.budget = new_budget
+
 
     def update_budget(self, new_budget):
         self.budget = new_budget
