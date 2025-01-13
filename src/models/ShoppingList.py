@@ -14,21 +14,33 @@ class ShoppingList:
         cur.close()
         conn.close()
         return items
-    
+
     def add_item(self, product_id, quantity):
         conn = createConnection()
         cursor = conn.cursor()
-        query = """
-            INSERT INTO shopping_list (user_id, product_id, quantity)
+
+        # Debug: Add print statements
+        print(f"Checking existence for product_id: {product_id}")
+
+        cursor.execute("SELECT 1 FROM products WHERE product_id = %s", [product_id])
+        result = cursor.fetchone()
+        print(f"Query result: {result}")
+
+        if not result:
+            cursor.close()
+            conn.close()
+            raise Exception(f"Product with ID {product_id} does not exist")
+
+        query = """INSERT INTO shopping_list (user_id, product_id, quantity)
             VALUES (%s, %s, %s)
             ON CONFLICT (user_id, product_id) DO UPDATE SET
-            quantity = shopping_list.quantity + EXCLUDED.quantity;
-        """
+            quantity = shopping_list.quantity + EXCLUDED.quantity;"""
+
         cursor.execute(query, [self.user_id, product_id, quantity])
         conn.commit()
         cursor.close()
         conn.close()
-    
+
     def remove_item(self, product_id):
         conn = createConnection()
         cursor = conn.cursor()

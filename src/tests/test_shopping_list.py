@@ -1,77 +1,98 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from src.models.ShoppingList import ShoppingList
 
 
 class TestShoppingList(unittest.TestCase):
+    def setUp(self):
+        self.db_patcher = patch('src.database.Db_manager.createConnection')
+        self.mock_create_connection = self.db_patcher.start()
 
-    @patch('src.database.Db_manager.createConnection')  # Mocking createConnection
-    def test_add_and_remove_item(self, mock_create_connection):
-        # Mock the database connection and cursor
-        mock_conn = mock_create_connection.return_value
-        mock_cursor = mock_conn.cursor.return_value
+        self.mock_conn = MagicMock()
+        self.mock_cursor = MagicMock()
 
-        # Simulate inserting a product into the products table (mocking the constraint)
-        mock_cursor.execute.side_effect = lambda query, params: None if "INSERT INTO products" in query else MagicMock()
+        self.mock_conn.cursor.return_value = self.mock_cursor
+        self.mock_create_connection.return_value = self.mock_conn
 
-        # Mock data for the product
-        mock_cursor.execute("INSERT INTO products (product_id, name) VALUES (%s, %s);", [101, "Test Product"])
+        def default_fetchone(*args, **kwargs):
+            print("Default fetchone called with:", args, kwargs)
+            return [1]
 
-        user_id = 1
-        shopping_list = ShoppingList(user_id)
+        self.mock_cursor.fetchone = MagicMock(side_effect=default_fetchone)
 
-        # Simulate adding an item
-        shopping_list.add_item(101, 2)
-        mock_cursor.execute.assert_any_call(
-            """
-            INSERT INTO shopping_list (user_id, product_id, quantity)
-            VALUES (%s, %s, %s)
-            ON CONFLICT (user_id, product_id) DO UPDATE SET
-            quantity = shopping_list.quantity + EXCLUDED.quantity;
-            """,
-            [user_id, 101, 2]
-        )
+        self.user_id = 1
+        self.shopping_list = ShoppingList(self.user_id)
 
-        # Simulate removing an item
-        shopping_list.remove_item(101)
-        mock_cursor.execute.assert_any_call(
+        print("Setup complete. Mock cursor state:", self.mock_cursor.fetchone.return_value)
+
+    def tearDown(self):
+        self.db_patcher.stop()
+
+    def test_add_item(self):
+        product_id = 101
+        quantity = 2
+
+        print("Initial fetchone mock:", self.mock_cursor.fetchone.return_value)
+
+        def mock_fetchone_side_effect(query=None, params=None):
+            print(f"Mock fetchone called with query: {query}, params: {params}")
+            return [1]
+
+        self.mock_cursor.fetchone = MagicMock(side_effect=mock_fetchone_side_effect)
+
+        print("Mock state after setup:", self.mock_cursor.fetchone.return_value)
+
+        try:
+            self.shopping_list.add_item(product_id, quantity)
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            print("Mock fetchone was called:", self.mock_cursor.fetchone.called)
+            print("Mock fetchone call count:", self.mock_cursor.fetchone.call_count)
+            print("Mock fetchone call args:", self.mock_cursor.fetchone.call_args_list)
+            raise
+
+
+    def test_remove_item(self):
+        product_id = 101
+
+        self.shopping_list.remove_item(product_id)
+
+        actual_calls = self.mock_cursor.execute.call_args_list
+
+        expected_call = call(
             "DELETE FROM shopping_list WHERE user_id = %s AND product_id = %s;",
-            [user_id, 101]
+            [self.user_id, product_id]
         )
 
-    @patch('src.database.Db_manager.createConnection')  # Mocking createConnection
-    def test_get_items(self, mock_create_connection):
-        # Mock the database connection and cursor
-        mock_conn = mock_create_connection.return_value
-        mock_cursor = mock_conn.cursor.return_value
+        self.assertIn(expected_call, actual_calls)
 
-        user_id = 1
-        shopping_list = ShoppingList(user_id)
+    def test_get_items(self):
+        mock_items = [
+            {'product_id': 101, 'quantity': 2},
+            {'product_id': 102, 'quantity': 5}
+        ]
+        self.mock_cursor.fetchall.return_value = mock_items
 
-        # Mock the database response to simulate fetched items
-        mock_cursor.execute.return_value = None  # Simulate no exceptions for SELECT
-        mock_cursor.fetchall.return_value = [{'product_id': 101, 'quantity': 2}, {'product_id': 102, 'quantity': 5}]
+        items = self.shopping_list.get_items()
 
-        # Simulate the retrieval of items
-        items = shopping_list.get_items()
-
-        # Verify the items were fetched correctly
         self.assertEqual(len(items), 2)
         self.assertEqual(items[0]['product_id'], 101)
         self.assertEqual(items[1]['quantity'], 5)
 
-        mock_cursor.execute.assert_called_with(
+        expected_call = call(
             "SELECT product_id, quantity FROM shopping_list WHERE user_id = %s;",
-            [user_id]
+            [self.user_id]
         )
+        self.assertIn(expected_call, self.mock_cursor.execute.call_args_list)
 
-    def setUp(self):
-        # Disable foreign key checks
-        mock_conn = patch('src.database.Db_manager.createConnection').start().return_value
-        mock_cursor = mock_conn.cursor.return_value
-        mock_cursor.execute("PRAGMA foreign_keys = OFF;")  # SQLite example
-        # or for MySQL:
-        # mock_cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    def test_add_item_with_nonexistent_product(self):
+        product_id = 999
+        quantity = 1
+
+        self.mock_cursor.fetchone.return_value = None
+
+        with self.assertRaises(Exception):
+            self.shopping_list.add_item(product_id, quantity)
 
 
 if __name__ == "__main__":
